@@ -5,26 +5,35 @@ import csv
 
 ## GLOBALS
 
-wPWD = 'password'
-rPWD = 'password'
+wCliOpt = '/home/john/client-ssl/CastawayCay_MySQL/.writeclient.cnf'
+rCliOpt = '/home/john/client-ssl/CastawayCay_MySQL/.readclient.cnf'
 DB_NAME = 'iris'
-D_FILE = 'iris.data'
+D_FILE = 'iris_ch.data'
 CNK_SIZE = 100
 
-# Tables Creation Statements
+# Table Creation Statements
 TABLES = {}
-TABLES['data'] = (
-        "CREATE TABLE `data` ("
-        "    `sepal-length` FLOAT(10),"
-        "    `sepal-width` FLOAT(10),"
-        "    `petal-length` FLOAT(10),"
-        "    `petal-width` FLOAT(10),"
-        "    `class` VARCHAR(20)"
-        ")")
+TABLES['data'] = {}
+TABLES['data'] = {
+        'csv':'iris_ch.data',
+        'create':(
+                "CREATE TABLE `data` ("
+                "    `sepal-length` FLOAT(10),"
+                "    `sepal-width` FLOAT(10),"
+                "    `petal-length` FLOAT(10),"
+                "    `petal-width` FLOAT(10),"
+                "    `class` VARCHAR(20)"
+                ")"),
+        'populate':(
+                "INSERT INTO data "
+                "(sepal-length, sepal-width, petal-length, petal-width, class) "
+                "VALUES (%f, %f, %f, %f, %s)")
+        }
 
 
 ## FUNCTIONS
 
+# DO NOT MODIFY!
 # Creates a database or returns an error
 def create_database(cursor):
     try: cursor.execute(
@@ -36,38 +45,38 @@ def create_database(cursor):
 
 ## MAIN
 
-# Connect to the server and grab the cursor
-#conn = mysql.connector.connect(host='CastawayCay', user='writeclient', password=wPWD)
-conn = mysql.connector.connect(host='127.0.0.1', user='root', password=raw_input('mysql password:')
-cursor = conn.cursor()
-
-# Use the DB_NAME database or create it if doesn't exist
-try: conn.database = DB_NAME
+# DO NOT MODIFY!
+# Establish connection and cursor
+conn = mysql.connector.connect(option_files=wCliOpt) # establish connection
+cursor = conn.cursor()                               # grab a cursor
+# Use or establish database
+try: conn.database = DB_NAME # try to use database
 except mysql.connector.Error as err:
     if err.errno == mysql.connector.errorcode.ER_BAD_DB_ERROR:
-        create_database(cursor)
-        conn.database = DB_NAME
-    else:
+        create_database(cursor) # if database doesn't exist, create it
+        conn.database = DB_NAME # use the created database
+    else: # print any other error
         print(err)
         exit(1)
-
-# Iterate through table statements to create tables
-for table in TABLES.keys():
+# Create tables
+for table in TABLES.keys(): # Iterate through the table creation statements
     try:
         print 'Creating table %s: ' % table,
-        cursor.execute(TABLES[table])
+        cursor.execute(TABLES[table]['create']) # create the table
     except mysql.connector.Error as err:
         if err.errno == mysql.connector.errorcode.ER_TABLE_EXISTS_ERROR:
             print 'already exists.'
         else:
-            # TBD
-            # write a loop to add chunked data
-            print 'OK.'
-    
-    
-with open(D_FILE) as csvfile:
-    data = [row for row in csv.reader(csvfile)]
-#    print data
+            print err.msg
+    else:
+        # Populate the table
+        data = csv.reader(file(TABLES[table]['csv']))
+        next(data) # skip header file
+        for row in data:
+            print row
+            cursor.execute(TABLES[table]['populate'], row)
+        print 'OK.'
+
 
 
 
