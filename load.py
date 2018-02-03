@@ -1,5 +1,7 @@
-import pymysql
 import sqlalchemy as sa
+import csv
+import os
+import pymysql
 from odo import odo
 
 
@@ -19,15 +21,26 @@ wCliOpt = '/home/john/client-ssl/CastawayCay_MySQL/.writeclient.cnf'
 DB_NAME = 'iris'
 TABLES = []
 TABLES.append(tabEntry(name = 'data',
-                       csv = 'iris_ch.data',
+                       csv = 'iris.data',
                        cols = [('sepal_length', sa.Float),
                                ('sepal_width', sa.Float),
                                ('petal_length', sa.Float),
                                ('petal_width', sa.Float),
-                               ('class', sa.String(20))]))
+                               ('class_name', sa.String(20))]))
 
 
 ## FUNCTIONS
+
+# Performs rudimentary data cleaning on source file
+def clean(fname):
+    name, ext = os.path.splitext(fname)
+    from_file = csv.reader(open(fname, 'r'), delimiter=',')
+    to_file = csv.writer(open(name+'_cleaned'+ext, 'w+'), delimiter=',')
+    for r in from_file:
+        r = [s.replace('-','_') for s in r] # replace '-' with '_'
+        to_file.writerow(r)
+    return name+'_cleaned'+ext
+    
 
 # DO NOT MODIFY! - Creates a connection to MySQL Server
 def mysql_connect_w():
@@ -72,6 +85,7 @@ metadata = sa.MetaData(bind=db_eng) # holds database information
 
 # Loop through all table entries
 for te in TABLES:
+    fname = clean(te.csv)
     # create the sqlalchemy.table object
     tbl = sa.Table(
         te.name,
@@ -83,7 +97,7 @@ for te in TABLES:
         tbl.drop(checkfirst=True)
     tbl.create()
     add_autoinc_col(db_eng, te.name)    # Add AUTOINCREMENT COLUMN
-    odo(te.csv, tbl)                    # bulk-load the .csv using odo
+    odo(fname, tbl)                    # bulk-load the .csv using odo
     print 'OK.'
 print 'Table loading complete!'
 
