@@ -18,15 +18,26 @@ class tabEntry:
 ## GLOBALS - Modify!
 
 wCliOpt = '/home/john/client-ssl/CastawayCay_MySQL/.writeclient.cnf'
-DB_NAME = 'iris'
+DB_NAME = 'sandbox'
 TABLES = []
-TABLES.append(tabEntry(name = 'data',
+TABLES.append(tabEntry(name = 'iris',
                        csv = 'iris.data',
                        cols = [('sepal_length', sa.Float),
                                ('sepal_width', sa.Float),
                                ('petal_length', sa.Float),
                                ('petal_width', sa.Float),
                                ('class_name', sa.String(20))]))
+TABLES.append(tabEntry(name = 'pima',
+                       csv = 'pima_diabetes.data',
+                       cols = [('times_preg', sa.Integer),
+                               ('gluc_con', sa.Integer),
+                               ('dis_bld_press', sa.Integer),
+                               ('tric_thkness', sa.Integer),
+                               ('2hr_insul', sa.Integer),
+                               ('bmi', sa.Float),
+                               ('diab_ped', sa.Float),
+                               ('age', sa.Integer),
+                               ('positive', sa.Boolean)]))
 
 
 ## FUNCTIONS
