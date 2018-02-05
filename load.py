@@ -17,7 +17,8 @@ class tabEntry:
 
 ## GLOBALS - Modify!
 
-wCliOpt = '/home/john/client-ssl/CastawayCay_MySQL/.writeclient.cnf'
+#wCliOpt = '/home/john/client-ssl/CastawayCay_MySQL/.writeclient.cnf' # from Tortuga VM
+wCliOpt = '/home/john/Application_Files/MySQL/.local_sql.cnf' # from John's laptop
 DB_NAME = 'sandbox'
 TABLES = []
 TABLES.append(tabEntry(name = 'iris',

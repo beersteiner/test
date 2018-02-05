@@ -13,7 +13,8 @@ import pymysql
 
 #### GLOBALS ####
 
-rCliOpt = '/home/john/client-ssl/CastawayCay_MySQL/.readclient.cnf'
+#rCliOpt = '/home/john/client-ssl/CastawayCay_MySQL/.readclient.cnf' # from Tortuga VM
+rCliOpt = '/home/john/Application_Files/MySQL/.local_sql.cnf' # from John's laptop
 DB_NAME = 'iris'
 TBL_NAME = 'data'
 
